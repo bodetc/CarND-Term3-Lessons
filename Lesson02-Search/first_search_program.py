@@ -21,19 +21,96 @@ grid = [[0, 0, 1, 0, 0, 0],
         [0, 0, 1, 1, 1, 0],
         [0, 0, 0, 0, 1, 0]]
 init = [0, 0]
-goal = [len(grid)-1, len(grid[0])-1]
+goal = [len(grid) - 1, len(grid[0]) - 1]
 cost = 1
 
-delta = [[-1, 0], # go up
-         [ 0,-1], # go left
-         [ 1, 0], # go down
-         [ 0, 1]] # go right
+delta = [[-1, 0],  # go up
+         [0, -1],  # go left
+         [1, 0],  # go down
+         [0, 1]]  # go right
 
 delta_name = ['^', '<', 'v', '>']
 
-def search(grid,init,goal,cost):
-    # ----------------------------------------
-    # insert code here
-    # ----------------------------------------
 
-    return path
+def search(grid, init, goal, cost, debug = False):
+    def getTriplet(extension, position):
+        return [extension, position[0], position[1]]
+
+    def unpack(triplet):
+        return triplet[0], [triplet[1], triplet[2]]
+
+    def popNextValue(open):
+        open.sort()
+        open.reverse()
+        return open.pop()
+
+    def getNeighbours(pos):
+        neighbours = []
+        for d in delta:
+            neighbours.append([pos[0] + d[0], pos[1] + d[1]])
+        return neighbours
+
+    def isSamePosition(pos1, pos2):
+        return pos1[0] == pos2[0] and pos1[1] == pos2[1]
+
+    def isInGrid(pos, grid):
+        return 0 <= pos[0] < len(grid) and 0 <= pos[1] < len(grid[0])
+
+    def isOpen(pos, closed):
+        return closed[pos[0]][pos[1]] == 0
+
+    def setClosed(pos, closed):
+        closed[pos[0]][pos[1]] = 1
+
+    closed = [[grid[row][col] for col in range(len(grid[0]))] for row in range(len(grid))]
+    open = [getTriplet(0, init)]
+
+    if debug:
+        print 'Initial open list:'
+        for o in open:
+            print '    ', o
+        print '---'
+
+    while True:
+
+        # If open nodes are empty, it is impossible to find a solution
+        if len(open) == 0:
+            print 'fail'
+            return 'fail'
+
+        next = popNextValue(open)
+        g, pos = unpack(next)
+
+        setClosed(pos, closed)
+
+        if debug:
+            print 'Next item:'
+            print '    ', next
+
+        if isSamePosition(pos, goal):
+            if debug:
+                print 'Search successful!'
+            return next
+
+        neighbours = getNeighbours(pos)
+        for pos2 in neighbours:
+            if debug:
+                print 'Searching ', pos2
+
+            if isInGrid(pos2, grid) and isOpen(pos2, closed):
+                g2 = g+cost
+                new = getTriplet(g2, pos2)
+                if debug:
+                    print 'Append list item:'
+                    print new
+                open.append(new)
+
+                setClosed(pos2, closed)
+
+        if debug:
+            print 'New open list:'
+            for o in open:
+                print '    ', o
+            print '---'
+
+search(grid, init, goal, cost, debug=True)
