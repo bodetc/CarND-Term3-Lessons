@@ -59,11 +59,12 @@ def search(grid, init, goal, cost, debug = False):
     def isOpen(pos, closed):
         return closed[pos[0]][pos[1]] == 0
 
-    def setClosed(pos, closed):
-        closed[pos[0]][pos[1]] = 1
+    expand = [[-1 for row in range(len(grid[0]))] for col in range(len(grid))]
 
     closed = [[grid[row][col] for col in range(len(grid[0]))] for row in range(len(grid))]
     open = [getTriplet(0, init)]
+
+    iteration = 0
 
     if debug:
         print 'Initial open list:'
@@ -76,12 +77,17 @@ def search(grid, init, goal, cost, debug = False):
         # If open nodes are empty, it is impossible to find a solution
         if len(open) == 0:
             print 'fail'
-            return 'fail'
+            return expand
 
         next = popNextValue(open)
         g, pos = unpack(next)
 
-        setClosed(pos, closed)
+        # Close position
+        closed[pos[0]][pos[1]] = 1
+
+        # Write expansion
+        expand[pos[0]][pos[1]] = iteration
+        iteration += 1
 
         if debug:
             print 'Next item:'
@@ -90,7 +96,7 @@ def search(grid, init, goal, cost, debug = False):
         if isSamePosition(pos, goal):
             if debug:
                 print 'Search successful!'
-            return next
+            return expand
 
         neighbours = getNeighbours(pos)
         for pos2 in neighbours:
@@ -105,7 +111,8 @@ def search(grid, init, goal, cost, debug = False):
                     print new
                 open.append(new)
 
-                setClosed(pos2, closed)
+                # Close position
+                closed[pos2[0]][pos2[1]] = 1
 
         if debug:
             print 'New open list:'
@@ -113,4 +120,7 @@ def search(grid, init, goal, cost, debug = False):
                 print '    ', o
             print '---'
 
-search(grid, init, goal, cost, debug=True)
+expand = search(grid, init, goal, cost, debug=True)
+
+print 'Expansion:'
+print expand
