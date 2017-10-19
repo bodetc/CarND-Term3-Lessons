@@ -33,7 +33,7 @@ delta = [[-1, 0],  # go up
 delta_name = ['^', '<', 'v', '>']
 
 
-def compute_value(grid, goal, cost, debug=False):
+def optimum_policy(grid, goal, cost, debug=False):
     def getTriplet(extension, position):
         return [extension, position[0], position[1]]
 
@@ -57,7 +57,8 @@ def compute_value(grid, goal, cost, debug=False):
     open = [getTriplet(0, goal)]
 
     previous = [[[] for row in range(len(grid[0]))] for col in range(len(grid))]
-    all_arrows = [['X' for row in range(len(grid[0]))] for col in range(len(grid))]
+    optimum_policy = [[' ' for row in range(len(grid[0]))] for col in range(len(grid))]
+    optimum_policy[goal[0]][goal[1]]='*'
 
     def popNextValue():
         open.sort()
@@ -88,7 +89,7 @@ def compute_value(grid, goal, cost, debug=False):
                 closed[pos2[0]][pos2[1]] = 1
 
                 # Fill helpers
-                all_arrows[pos2[0]][pos2[1]] = arrow
+                optimum_policy[pos2[0]][pos2[1]] = arrow
                 previous[pos2[0]][pos2[1]] = pos
         if debug:
             print 'New open list:'
@@ -125,12 +126,15 @@ def compute_value(grid, goal, cost, debug=False):
         print 'Value:'
         print value
         print 'Arrows:'
-        print all_arrows
+        print optimum_policy
 
-    return value
+    return optimum_policy
 
 
-expand = compute_value(grid, goal, cost, debug=True)
+optimum_policy = optimum_policy(grid, goal, cost, debug=True)
 
-print 'Expand:'
-print expand
+print 'Grid:'
+print grid
+
+print 'Policy:'
+print optimum_policy
