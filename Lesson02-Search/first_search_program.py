@@ -15,11 +15,17 @@
 #   0 = Navigable space
 #   1 = Occupied space
 
-grid = [[0, 0, 1, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0],
-        [0, 0, 0, 0, 1, 0],
-        [0, 0, 1, 1, 1, 0],
+grid = [[0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
         [0, 0, 0, 0, 1, 0]]
+heuristic = [[9, 8, 7, 6, 5, 4],
+             [8, 7, 6, 5, 4, 3],
+             [7, 6, 5, 4, 3, 2],
+             [6, 5, 4, 3, 2, 1],
+             [5, 4, 3, 2, 1, 0]]
+
 init = [0, 0]
 goal = [len(grid) - 1, len(grid[0]) - 1]
 cost = 1
@@ -32,12 +38,12 @@ delta = [[-1, 0],  # go up
 delta_name = ['^', '<', 'v', '>']
 
 
-def search(grid, init, goal, cost, debug=False):
-    def getTriplet(extension, position):
-        return [extension, position[0], position[1]]
+def search(grid, init, goal, cost, heurisitc, debug=False):
+    def getTuple(h, g, position):
+        return [h, g, position[0], position[1]]
 
     def unpack(triplet):
-        return triplet[0], [triplet[1], triplet[2]]
+        return triplet[0], triplet[1], [triplet[2], triplet[3]]
 
     def getNeighbours(pos):
         neighbours = []
@@ -53,7 +59,7 @@ def search(grid, init, goal, cost, debug=False):
     expand = [[-1 for row in range(len(grid[0]))] for col in range(len(grid))]
 
     closed = [[grid[row][col] for col in range(len(grid[0]))] for row in range(len(grid))]
-    open = [getTriplet(0, init)]
+    open = [getTuple(heurisitc[init[0]][init[1]], 0, init)]
 
     previous = [[[] for row in range(len(grid[0]))] for col in range(len(grid))]
     all_arrows = [['X' for row in range(len(grid[0]))] for col in range(len(grid))]
@@ -77,7 +83,8 @@ def search(grid, init, goal, cost, debug=False):
 
             if isInGrid(pos2) and isOpen(pos2):
                 g2 = g + cost
-                new = getTriplet(g2, pos2)
+                h2 = g2 + heurisitc[pos2[0]][pos2[1]]
+                new = getTuple(h2, g2, pos2)
                 if debug:
                     print 'Append list item:'
                     print new
@@ -115,7 +122,7 @@ def search(grid, init, goal, cost, debug=False):
 
         else:
             next = popNextValue()
-            g, pos = unpack(next)
+            h, g, pos = unpack(next)
 
             # Close position
             closed[pos[0]][pos[1]] = 1
@@ -143,19 +150,19 @@ def search(grid, init, goal, cost, debug=False):
         print all_arrows
 
     if found:
-        path=[[' ' for col in range(len(grid[0]))] for row in range(len(grid))]
+        path = [[' ' for col in range(len(grid[0]))] for row in range(len(grid))]
         current = goal
-        path[goal[0]][goal[1]]='*'
+        path[goal[0]][goal[1]] = '*'
 
         while not isSamePosition(current, init):
-            p=previous[current[0]][current[1]]
-            path[p[0]][p[1]]=all_arrows[current[0]][current[1]]
-            current=p
+            p = previous[current[0]][current[1]]
+            path[p[0]][p[1]] = all_arrows[current[0]][current[1]]
+            current = p
 
         return path
 
 
-path = search(grid, init, goal, cost, debug=True)
+path = search(grid, init, goal, cost, heuristic, debug=True)
 
 print 'Path:'
 print path
