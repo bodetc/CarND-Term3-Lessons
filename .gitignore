@@ -102,3 +102,7 @@ ENV/
 
 # IDE files
 .idea/
+Lesson3-Prediction-C++/cmake-build-debug/
+Lesson3-Prediction-C++/data/*
+Lesson3-Prediction-Python/*.json
+Lesson3-Prediction-C++/CMakeLists.txt
