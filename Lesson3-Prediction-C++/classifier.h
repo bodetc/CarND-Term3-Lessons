@@ -6,13 +6,21 @@
 #include <math.h>
 #include <vector>
 
+#define N_LABELS 3
+#define N_VARS 4
+
 using namespace std;
 
 class GNB {
+private:
+  vector<string> possible_labels = {"left","keep","right"};
+
+  double means[N_LABELS][N_VARS];
+  double stds[N_LABELS][N_VARS];
+
+  int getIndex(const string & label);
+
 public:
-
-	vector<string> possible_labels = {"left","keep","right"};
-
 
 	/**
   	* Constructor
@@ -26,7 +34,7 @@ public:
 
  	void train(vector<vector<double> > data, vector<string>  labels);
 
-  	string predict(vector<double>);
+  	string predict(const vector<double>& observation);
 
 };
 
